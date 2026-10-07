@@ -1,0 +1,47 @@
+# Läuft automatisch Montag bis Freitag nach US-Börsenschluss
+# und aktualisiert das Dashboard im Ordner docs/.
+name: Täglicher Scan
+
+on:
+  schedule:
+    - cron: "30 22 * * 1-5"   # 22:30 UTC = 00:30 Uhr (Sommerzeit) bzw. 23:30 Uhr (Winterzeit)
+  workflow_dispatch:           # erlaubt den Start per Knopfdruck ("Run workflow")
+
+permissions:
+  contents: write              # damit das Ergebnis gespeichert werden darf
+
+concurrency:
+  group: scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Code holen
+        uses: actions/checkout@v5
+
+      - name: Python einrichten
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Pakete installieren
+        run: pip install -r requirements.txt
+
+      - name: Scan ausführen
+        run: python scanner.py
+
+      - name: Ergebnis speichern
+        run: |
+          git config user.name "signal-scanner-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs tickers_nasdaq100.csv
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen."
+          else
+            git commit -m "Scan vom $(date -u +%Y-%m-%d)"
+            git push
+          fi
