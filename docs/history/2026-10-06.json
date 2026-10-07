@@ -741,15 +741,6 @@
     "age": 0
    }
   ],
-  "WBD": [
-   {
-    "cat": "rsi",
-    "dir": "bear",
-    "label": "RSI überkauft",
-    "detail": "RSI 75,2 (über 70)",
-    "age": 0
-   }
-  ],
   "WDC": [
    {
     "cat": "macd",
