@@ -13,10 +13,10 @@ und zeigt die Treffer auf einer eigenen Webseite – auch auf dem Handy.
 | RSI (14) | unter 30 = überverkauft ▲, über 70 = überkauft ▼ |
 | MACD (12, 26, 9) | MACD kreuzt die Signallinie ▲▼ |
 | Gleitende Durchschnitte | Golden/Death Cross (SMA 50/200), Kurs kreuzt EMA 20 bzw. EMA 50 ▲▼ |
-| Trendbasierte Fibonacci-Extension | Abwärtstrend (Hoch A → Tief B → tieferes Hoch C): Kurs erreicht 100 % oder 138,2 % = mögliche Kaufzone ▲. Aufwärtstrend (Tief → Hoch → höheres Tief): Kursziel erreicht ▼. ◆ = Kurs nähert sich dem Level. |
+| Elliott-ABC + trendbasierte Fibonacci-Extension | Nur Abwärtstrend: Start (Hoch) → A (Tief) → B (Erholung unter dem Start), dann läuft Welle C. Level = B − (Start − A) × 100 / 138,2 / 161,8 / 200 %. Signal ▲ (mögliche Kaufzone), wenn das Tagestief 100 %, 138,2 % oder 200 % erreicht. ◆ = Kurs ist nur noch 3 % über dem nächsten Level. |
 | Liquidity Swings (nach LuxAlgo) | Schlusskurs bricht durch eine Swing-Zone, in der sich viel Volumen gesammelt hat ▲▼ |
 
-Kreuzungen zählen, wenn sie in den letzten 3 Handelstagen passiert sind. Alles lässt sich in `config.py` einstellen.
+Kreuzungen zählen, wenn sie in den letzten 3 Handelstagen passiert sind. Startest du den Scan tagsüber, lässt er die noch unfertige Tageskerze weg. Alles lässt sich in `config.py` einstellen.
 
 ---
 
@@ -76,7 +76,7 @@ Der nächste Scan benutzt die neuen Werte (oder sofort per *Run workflow*).
 
 Beispiele:
 - Nur heutige Kreuzungen: `SIGNAL_LOOKBACK_BARS = 1`
-- Fibonacci-Ziele im Aufwärtstrend ausblenden: `FIB_SIGNAL_UPTREND = False`
+- Auch bei 161,8 % ein Signal: `FIB_SIGNAL_LEVELS = [1.0, 1.382, 1.618, 2.0]`
 - Nur sehr starke Liquiditätszonen: `LIQ_MIN_VOLUME_FACTOR = 10`
 
 ---

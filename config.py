@@ -41,19 +41,18 @@ GOLDEN_CROSS_SLOW = 200    # ... kreuzt SMA 200
 PRICE_CROSS_EMAS = [20, 50]  # Kurs kreuzt diese EMAs
 
 # ---------------------------------------------------------------------------
-# Trendbasierte Fibonacci-Extension
-#   Aufwärtstrend:  signifikantes Tief (A) -> Hoch (B) -> nächstes, höheres Tief (C)
-#   Abwärtstrend:   signifikantes Hoch (A) -> Tief (B) -> nächstes, tieferes Hoch (C)
-#   Level = C ± (B - A) × Ratio
+# Elliott-ABC-Korrektur mit trendbasierter Fibonacci-Extension (nur Abwärtstrend)
+#   Start (Hoch) -> A (Tief) -> B (Erholung unter dem Start) -> Welle C fällt
+#   Level = B - (Start - A) × Ratio   (wie "Trend-Based Fib Extension" in TradingView)
 # ---------------------------------------------------------------------------
-FIB_RATIOS = [1.0, 1.382]   # Diese Level lösen ein Signal aus
+FIB_LEVELS = [1.0, 1.382, 1.618, 2.0]   # Diese Level werden im Chart angezeigt
+FIB_SIGNAL_LEVELS = [1.0, 1.382, 2.0]   # Bei diesen Leveln kommt ein Signal
 # "Signifikant" = die Bewegung ist mindestens X-mal die typische Tagesschwankung (ATR).
 FIB_SWING_ATR_MULT = 4.0
 FIB_SWING_MIN_PCT = 5.0     # aber mindestens 5 % ...
 FIB_SWING_MAX_PCT = 25.0    # ... und höchstens 25 %
-FIB_TOLERANCE_PCT = 1.0     # Kurs gilt als "am Level", wenn er bis auf 1 % rankommt
-FIB_NEAR_PCT = 3.0          # "Annäherung"-Hinweis, wenn er bis auf 3 % dran ist
-FIB_SIGNAL_UPTREND = True   # Auch Ziele im Aufwärtstrend melden (Gewinne sichern?)
+FIB_TOLERANCE_PCT = 1.0     # Level gilt als erreicht, wenn das Tagestief bis auf 1 % rankommt
+FIB_NEAR_PCT = 3.0          # "Beobachten"-Hinweis, wenn der Kurs nur noch 3 % über dem Level ist
 
 # ---------------------------------------------------------------------------
 # Liquidity Swings (Nachbau der Logik von "Liquidity Swings [LuxAlgo]")

@@ -186,7 +186,17 @@ def ma_signals(df: pd.DataFrame, values: dict) -> list:
 
 
 # ===========================================================================
-# 4) Trendbasierte Fibonacci-Extension
+# 4) Elliott-ABC-Korrektur mit trendbasierter Fibonacci-Extension
+#
+#    Start (signifikantes Hoch)
+#      -> A (signifikantes Tief, Ende von Welle A)
+#      -> B (Erholung, bleibt unter dem Start, Ende von Welle B)
+#      -> Welle C läuft gerade nach unten.
+#
+#    Trendbasierte Extension (wie das TradingView-Werkzeug "Trend-Based Fib Extension"):
+#      Level = B - (Start - A) × Ratio
+#    also die Länge von Welle A, ab dem Punkt B nach unten abgetragen.
+#    Nur Abwärtsstrukturen – das Ziel ist ein möglichst günstiger Einstieg.
 # ===========================================================================
 
 def zigzag(high: np.ndarray, low: np.ndarray, dev: float):
@@ -239,6 +249,7 @@ def fib_signals(df: pd.DataFrame, values: dict) -> list:
     low = df["Low"].to_numpy()
     close = df["Close"].to_numpy()
     n = len(close)
+    values["fib"] = None
 
     # Wie groß muss eine Bewegung sein, um "signifikant" zu sein? -> abhängig von der Volatilität
     a = atr(high, low, close, 14)
@@ -246,81 +257,64 @@ def fib_signals(df: pd.DataFrame, values: dict) -> list:
     dev_pct = float(np.clip(atr_pct * cfg.FIB_SWING_ATR_MULT, cfg.FIB_SWING_MIN_PCT, cfg.FIB_SWING_MAX_PCT))
 
     pivots, leg = zigzag(high, low, dev_pct / 100)
-    values["zigzag_dev_pct"] = dev_pct
     if leg is None or len(pivots) < 3:
         return []
 
-    A, B, C = pivots[-3], pivots[-2], pivots[-1]
-    tol = cfg.FIB_TOLERANCE_PCT / 100
-    near = cfg.FIB_NEAR_PCT / 100
-    lb = cfg.SIGNAL_LOOKBACK_BARS
-
-    # Abwärtstrend: Hoch A -> Tief B -> tieferes Hoch C, aktueller Schenkel fällt
-    if leg[2] == "L" and A[2] == "H" and C[2] == "H" and C[1] < A[1]:
-        trend = "down"
-        levels = {r: C[1] - (A[1] - B[1]) * r for r in cfg.FIB_RATIOS}
-    # Aufwärtstrend: Tief A -> Hoch B -> höheres Tief C, aktueller Schenkel steigt
-    elif leg[2] == "H" and A[2] == "L" and C[2] == "L" and C[1] > A[1]:
-        trend = "up"
-        levels = {r: C[1] + (B[1] - A[1]) * r for r in cfg.FIB_RATIOS}
-    else:
-        values["fib"] = None
+    S, A, B = pivots[-3], pivots[-2], pivots[-1]
+    # Nur Abwärts-ABC: Start = Hoch, A = Tief, B = Hoch unter dem Start, Welle C fällt gerade
+    if not (S[2] == "H" and A[2] == "L" and B[2] == "H" and leg[2] == "L" and B[1] < S[1]):
         return []
-    if min(levels.values()) <= 0:   # Bewegung zu extrem, Extension ergibt keinen Sinn
-        values["fib"] = None
+
+    wave_a = S[1] - A[1]
+    levels = {r: B[1] - wave_a * r for r in cfg.FIB_LEVELS}
+    if min(levels.values()) <= 0:   # Bewegung zu extrem, die Extension ergibt keinen Sinn
         return []
 
     values["fib"] = dict(
-        trend=trend,
-        points=[dict(i=int(p[0]), p=float(p[1]), t=p[2]) for p in (A, B, C)],
+        points=[dict(i=int(p[0]), p=float(p[1]), name=name) for p, name in ((S, "Start"), (A, "A"), (B, "B"))],
         levels={f"{r:g}": float(v) for r, v in levels.items()},
+        signal_levels=[f"{r:g}" for r in cfg.FIB_SIGNAL_LEVELS],
+        c_low=dict(i=int(leg[0]), p=float(leg[1])),          # bisher tiefster Punkt von Welle C
+        retrace_b=round((B[1] - A[1]) / wave_a * 100, 1),   # wie weit B Welle A zurückgeholt hat
         dev_pct=round(dev_pct, 1),
     )
-    if trend == "up" and not cfg.FIB_SIGNAL_UPTREND:
-        return []
 
-    start = C[0] + 1
-    ratios = sorted(levels)
+    tol = cfg.FIB_TOLERANCE_PCT / 100
+    near = cfg.FIB_NEAR_PCT / 100
+    lb = cfg.SIGNAL_LOOKBACK_BARS
+    first = B[0] + 1
+    ratios = sorted(r for r in cfg.FIB_SIGNAL_LEVELS if r in levels)
 
     def pct_label(r):
         return fmt(r * 100, 1).replace(",0", "")
 
-    # Wann wurde welches Level seit Punkt C zum ersten Mal erreicht?
+    # Wann hat Welle C welches Signal-Level zum ersten Mal erreicht? (Tagestief bis auf 1 % dran)
     first_hits = {}
     for r in ratios:
-        lvl = levels[r]
-        if trend == "down":
-            reached = np.where(low[start:] <= lvl * (1 + tol))[0]
-        else:
-            reached = np.where(high[start:] >= lvl * (1 - tol))[0]
+        reached = np.where(low[first:] <= levels[r] * (1 + tol))[0]
         if len(reached):
-            first_hits[r] = start + int(reached[0])
+            first_hits[r] = first + int(reached[0])
 
-    # Signal: das extremste erreichte Level, wenn es frisch ist oder der Kurs noch dort steht
+    # Signal: das tiefste erreichte Signal-Level – wenn es frisch ist oder der Kurs noch dort steht
     if first_hits:
         r = max(first_hits)
         lvl = levels[r]
         age = n - 1 - first_hits[r]
         in_zone = abs(close[-1] / lvl - 1) <= tol
         if age < lb or in_zone:
-            age = int(age) if age < lb else 0
-            if trend == "down":
-                return [dict(cat="fib", dir="bull", label=f"Fib {pct_label(r)} % erreicht",
-                             detail=f"Abwärtstrend-Extension bei {fmt(lvl)} – mögliche Kaufzone", age=age)]
-            return [dict(cat="fib", dir="bear", label=f"Fib-Ziel {pct_label(r)} % erreicht",
-                         detail=f"Aufwärtstrend-Extension bei {fmt(lvl)} – Gewinne sichern?", age=age)]
+            return [dict(cat="fib", dir="bull", label=f"Welle C: Fib {pct_label(r)} % erreicht",
+                         detail=f"Trendbasierte Extension Start→A→B bei {fmt(lvl)} – mögliche Kaufzone",
+                         age=int(age) if age < lb else 0)]
 
-    # Sonst: Annäherung an das nächste noch nicht erreichte Level melden
+    # Sonst: Annäherung an das nächste noch nicht erreichte Signal-Level
     pending = [r for r in ratios if r not in first_hits]
-    if not pending:
-        return []
-    r = pending[0]
-    lvl = levels[r]
-    dist = (close[-1] / lvl - 1) if trend == "down" else (1 - close[-1] / lvl)
-    if 0 < dist <= near:
-        what = "Abwärtstrend – Kaufzone" if trend == "down" else "Aufwärtstrend – Ziel"
-        return [dict(cat="fib", dir="watch", label=f"Nähert sich Fib {pct_label(r)} %",
-                     detail=f"Noch {fmt(dist * 100, 1)} % bis {fmt(lvl)} ({what})", age=0)]
+    if pending:
+        r = pending[0]
+        lvl = levels[r]
+        dist = close[-1] / lvl - 1
+        if 0 < dist <= near:
+            return [dict(cat="fib", dir="watch", label=f"Welle C nähert sich Fib {pct_label(r)} %",
+                         detail=f"Noch {fmt(dist * 100, 1)} % bis {fmt(lvl)} – mögliche Kaufzone", age=0)]
     return []
 
 

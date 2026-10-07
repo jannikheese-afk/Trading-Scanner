@@ -262,6 +262,7 @@ const DIRNAME = { bull: "Bullisch", bear: "Bärisch", watch: "Beobachten" };
 const CATS = [
   ["rsi", "RSI"], ["macd", "MACD"], ["ma", "Gleitende Ø"], ["fib", "Fibonacci"], ["liq", "Liquidität"],
 ];
+const pctTxt = (x) => nf(1).format(x * 100).replace(",0", "") + " %";
 const ageText = (a) => a === 0 ? "aktuell" : a === 1 ? "vor 1 Tag" : `vor ${a} Tagen`;
 const store = {
   get(k, d) { try { const v = localStorage.getItem("scanner:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
@@ -341,9 +342,10 @@ document.getElementById("tiles").addEventListener("click", (e) => {
       <dt>RSI</dt><dd>RSI(${s.rsi[0]}) unter ${s.rsi[1]} = überverkauft (▲), über ${s.rsi[2]} = überkauft (▼).</dd>
       <dt>MACD</dt><dd>MACD(${s.macd.join(", ")}) kreuzt seine Signallinie.</dd>
       <dt>Gleitende Ø</dt><dd>Golden/Death Cross (SMA ${s.cross[0]}/${s.cross[1]}) und Schlusskurs kreuzt EMA ${s.emas.join(" bzw. ")}.</dd>
-      <dt>Fibonacci</dt><dd>Trendbasierte Extension über die letzten drei signifikanten Wendepunkte A→B→C.
-        Im Abwärtstrend sind ${s.fib.map((x) => nf(1).format(x * 100).replace(",0", "") + " %").join(" und ")} mögliche Kaufzonen (▲),
-        im Aufwärtstrend Kursziele (▼). ◆ = Kurs nähert sich dem Level.</dd>
+      <dt>Fibonacci</dt><dd>Elliott-ABC-Korrektur im Abwärtstrend: Start (Hoch) → A (Tief) → B (Erholung unter dem Start),
+        danach läuft Welle C. Die trendbasierte Extension trägt die Länge von Welle A ab B nach unten ab
+        (${s.fib.map(pctTxt).join(" · ")}). Ein Signal (▲ mögliche Kaufzone) kommt, wenn das Tagestief
+        ${s.fib_signal.map(pctTxt).join(", ")} erreicht. ◆ = Kurs ist nur noch wenige Prozent über dem nächsten Level.</dd>
       <dt>Liquidität</dt><dd>Nach „Liquidity Swings“ (LuxAlgo, Pivot ${s.liq[0]}): Schlusskurs bricht durch eine Swing-Zone,
         in der sich mindestens das ${nf(0).format(s.liq[1])}-Fache des durchschnittlichen Tagesvolumens gesammelt hat.</dd>
     </dl>
@@ -477,7 +479,7 @@ function openDetail(card, scroll) {
   const last = (arr) => { for (let i = arr.length - 1; i >= 0; i--) if (arr[i] != null) return arr[i]; return null; };
 
   const legend = lineKeys.map((k, i) => `<span><i class="sw" style="border-color:${lineVar(i)}"></i>${lineName(k)} <span class="num">${fmtP(last(s.ch.lines[k]))}</span></span>`).join("")
-    + (s.fib ? `<span><i class="sw dash"></i>Fib-Level</span>` : "")
+    + (s.fib ? `<span><i class="sw dash"></i>Fib-Ziele Welle C</span>` : "")
     + (s.liq.length ? `<span><i class="sw box" style="background:var(--bull-tint);outline:1px solid var(--bull)"></i>Liq.-Zone Tief</span><span><i class="sw box" style="background:var(--bear-tint);outline:1px solid var(--bear)"></i>Liq.-Zone Hoch</span>` : "");
 
   const sigList = s.sig.length ? `<ul class="sig-detail">${s.sig.map((x) =>
@@ -486,13 +488,17 @@ function openDetail(card, scroll) {
 
   const rows = [];
   if (s.fib) {
-    const tr = s.fib.trend === "down" ? "Abwärtstrend" : "Aufwärtstrend";
-    const [A, B, C] = s.fib.points;
-    rows.push(`<tr><th>Fib-Punkte<span class="sub">${tr}</span></th><td class="num">A ${fmtP(A.p)} · B ${fmtP(B.p)} · C ${fmtP(C.p)}</td></tr>`);
-    for (const [k, v] of Object.entries(s.fib.levels)) {
+    const [S0, A, B] = s.fib.points;
+    const dt = (i) => (i >= 0 && i < s.ch.d.length) ? new Date(s.ch.d[i] + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "short" }) : "";
+    rows.push(`<tr><th>Start<span class="sub">Hoch vor Welle A</span></th><td class="num">${fmtP(S0.p)}<span class="sub">${dt(S0.i)}</span></td></tr>`);
+    rows.push(`<tr><th>A<span class="sub">Ende Welle A</span></th><td class="num">${fmtP(A.p)}<span class="sub">${dt(A.i)}</span></td></tr>`);
+    rows.push(`<tr><th>B<span class="sub">holt ${nf(0).format(s.fib.retrace_b)} % von Welle A zurück</span></th><td class="num">${fmtP(B.p)}<span class="sub">${dt(B.i)}</span></td></tr>`);
+    rows.push(`<tr><th>Welle C bisher<span class="sub">tiefster Kurs seit B</span></th><td class="num">${fmtP(s.fib.c_low.p)}<span class="sub">${dt(s.fib.c_low.i)}</span></td></tr>`);
+    for (const [k, v] of Object.entries(s.fib.levels).sort((a, b) => +a[0] - +b[0])) {
       const dist = (s.c / v - 1) * 100;
       const where = Math.abs(dist) < 0.05 ? "Kurs am Level" : `Kurs ${nf(1).format(Math.abs(dist))} % ${dist > 0 ? "darüber" : "darunter"}`;
-      rows.push(`<tr><th>Fib ${nf(1).format(+k * 100).replace(",0", "")} %</th><td class="num">${fmtP(v)}<span class="sub">${where}</span></td></tr>`);
+      const info = s.fib.signal_levels.includes(k) ? "" : " · nur Info";
+      rows.push(`<tr><th>Welle C ${pctTxt(+k)}<span class="sub">trendbasierte Ext.${info}</span></th><td class="num">${fmtP(v)}<span class="sub">${where}</span></td></tr>`);
     }
   }
   for (const z of s.liq) {
@@ -524,7 +530,7 @@ function drawChart(s, box) {
   if (s.fib) extra.push(...Object.values(s.fib.levels));
   for (const z of s.liq) extra.push(z.top, z.btm);
   for (const v of extra) if (v >= lo - span0 * 0.4 && v <= hi + span0 * 0.4) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
-  const pad = (hi - lo) * 0.04; lo -= pad * 1.8; hi += pad;
+  const pad = (hi - lo) * 0.05; lo -= pad * 1.8; hi += pad * 1.6;
   const step = pw / n;
   const X = (i) => padL + step * (i + 0.5);
   const Y = (v) => padT + (hi - v) / (hi - lo) * ph;
@@ -587,21 +593,28 @@ function drawChart(s, box) {
   });
   parts.push(`</g>`);
 
-  // Fibonacci
+  // Elliott-ABC + trendbasierte Fibonacci-Extension
   if (s.fib) {
-    const C = s.fib.points[2];
-    const x0 = C.i >= 0 ? X(C.i) : padL;
+    const S0 = s.fib.points[0];
+    const x0 = S0.i >= 0 ? X(S0.i) : padL;
     for (const [k, v] of Object.entries(s.fib.levels)) {
       if (v < lo || v > hi) continue;
-      parts.push(`<line x1="${x0}" x2="${padL + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="5 4"/>`);
-      parts.push(`<text x="${x0 + 4}" y="${Y(v) - 4}" font-size="10.5" font-weight="600" fill="var(--ink-2)" stroke="var(--surface)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">Fib ${nf(1).format(+k * 100).replace(",0", "")} % · ${fmtP(v)}</text>`);
+      const sig = s.fib.signal_levels.includes(k);
+      parts.push(`<line x1="${x0}" x2="${padL + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--ink-2)" stroke-width="${sig ? 1.3 : 1}" stroke-dasharray="${sig ? "5 4" : "2 4"}" opacity="${sig ? 1 : 0.7}"/>`);
+      parts.push(`<text x="${x0 + 4}" y="${Y(v) - 4}" font-size="10.5" font-weight="${sig ? 600 : 400}" fill="var(--ink-2)" stroke="var(--surface)" stroke-width="3" paint-order="stroke" stroke-linejoin="round">C ${pctTxt(+k)} · ${fmtP(v)}</text>`);
     }
-    for (const [j, p] of s.fib.points.entries()) {
+    // Wellenlinie Start → A → B → bisheriges Tief von Welle C
+    const wpts = [...s.fib.points, s.fib.c_low].filter((p) => p.i >= 0 && p.i < n);
+    if (wpts.length > 1) {
+      parts.push(`<polyline points="${wpts.map((p) => `${X(p.i).toFixed(1)},${Y(p.p).toFixed(1)}`).join(" ")}" fill="none" stroke="var(--ink-2)" stroke-width="1.2" stroke-linejoin="round" opacity=".75"/>`);
+    }
+    for (const p of s.fib.points) {
       if (p.i < 0 || p.i >= n) continue;
-      const isHigh = p.t === "H";
-      const y = Y(p.p) + (isHigh ? -9 : 9);
-      parts.push(`<circle cx="${X(p.i)}" cy="${y}" r="7" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="1"/>`);
-      parts.push(`<text x="${X(p.i)}" y="${y + 3.5}" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--ink)">${"ABC"[j]}</text>`);
+      const isHigh = p.name !== "A";
+      const w = p.name.length * 6.2 + 10;
+      const y = Y(p.p) + (isHigh ? -11 : 11);
+      parts.push(`<rect x="${X(p.i) - w / 2}" y="${y - 8}" width="${w}" height="16" rx="8" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="1"/>`);
+      parts.push(`<text x="${X(p.i)}" y="${y + 3.5}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink)">${p.name}</text>`);
     }
   }
 

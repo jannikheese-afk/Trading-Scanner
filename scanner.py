@@ -63,6 +63,19 @@ def load_tickers() -> pd.DataFrame:
 # 2) Kursdaten
 # ---------------------------------------------------------------------------
 
+def drop_unfinished_bar(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Läuft der Scan während der US-Handelszeit, ist die heutige Tageskerze noch nicht fertig.
+    Dann wird sie weggelassen, damit nur mit echten Schlusskursen gerechnet wird.
+    """
+    from zoneinfo import ZoneInfo
+    now_ny = datetime.now(ZoneInfo("America/New_York"))
+    market_closed = (now_ny.hour, now_ny.minute) >= (16, 15)
+    if len(df) and df.index[-1].date() == now_ny.date() and not market_closed:
+        return df.iloc[:-1]
+    return df
+
+
 def download(tickers: list) -> dict:
     import yfinance as yf
 
@@ -85,6 +98,7 @@ def download(tickers: list) -> dict:
                 else:
                     df = data
                 df = df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
+                df = drop_unfinished_bar(df)
             except Exception:
                 df = None
             if df is None or len(df) < 60:   # Neuzugänge mit kurzer Historie trotzdem prüfen
@@ -140,6 +154,8 @@ def build_stock(ticker: str, name: str, df: pd.DataFrame) -> dict:
     close = df["Close"].to_numpy()
     n = len(df)
     s = max(0, n - cfg.CHART_BARS)  # Startindex des Mini-Charts
+    if values.get("fib"):           # Chart so weit zurück, dass die ganze ABC-Struktur drauf ist
+        s = max(0, n - 200, min(s, values["fib"]["points"][0]["i"] - 8))
 
     def series(arr):
         return [r(x) for x in arr[s:]]
@@ -159,6 +175,7 @@ def build_stock(ticker: str, name: str, df: pd.DataFrame) -> dict:
     if fib:
         fib = dict(fib)
         fib["points"] = [dict(p, i=p["i"] - s, p=r(p["p"])) for p in fib["points"]]
+        fib["c_low"] = dict(i=fib["c_low"]["i"] - s, p=r(fib["c_low"]["p"]))
         fib["levels"] = {k: r(v) for k, v in fib["levels"].items()}
     liq = [dict(z, i=z["i"] - s, end=None if z["end"] is None else z["end"] - s)
            for z in values.get("liq_zones", [])]
@@ -229,7 +246,7 @@ def main():
         settings=dict(rsi=[cfg.RSI_LENGTH, cfg.RSI_OVERSOLD, cfg.RSI_OVERBOUGHT],
                       macd=[cfg.MACD_FAST, cfg.MACD_SLOW, cfg.MACD_SIGNAL],
                       emas=cfg.PRICE_CROSS_EMAS, cross=[cfg.GOLDEN_CROSS_FAST, cfg.GOLDEN_CROSS_SLOW],
-                      fib=cfg.FIB_RATIOS, liq=[cfg.LIQ_PIVOT_LENGTH, cfg.LIQ_MIN_VOLUME_FACTOR]),
+                      fib=cfg.FIB_LEVELS, fib_signal=cfg.FIB_SIGNAL_LEVELS, liq=[cfg.LIQ_PIVOT_LENGTH, cfg.LIQ_MIN_VOLUME_FACTOR]),
         stocks=stocks,
     )
     write_output(payload, demo)
