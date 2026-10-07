@@ -26,6 +26,15 @@
     "age": 1
    }
   ],
+  "ADP": [
+   {
+    "cat": "ma",
+    "dir": "bull",
+    "label": "Kurs über EMA 50",
+    "detail": "Schlusskurs kreuzt EMA 50 (263,82) nach oben",
+    "age": 0
+   }
+  ],
   "ADSK": [
    {
     "cat": "ma",
@@ -58,12 +67,21 @@
     "age": 1
    }
   ],
+  "AMD": [
+   {
+    "cat": "rsi",
+    "dir": "bear",
+    "label": "RSI überkauft",
+    "detail": "RSI 70,7 (über 70)",
+    "age": 0
+   }
+  ],
   "AMGN": [
    {
     "cat": "ma",
     "dir": "bull",
     "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (406,98) nach oben",
+    "detail": "Schlusskurs kreuzt EMA 20 (407,04) nach oben",
     "age": 0
    }
   ],
@@ -118,9 +136,9 @@
   "AXON": [
    {
     "cat": "fib",
-    "dir": "watch",
-    "label": "Nähert sich Fib 138,2 %",
-    "detail": "Noch 1,8 % bis 403,79 (Abwärtstrend – Kaufzone)",
+    "dir": "bull",
+    "label": "Welle C: Fib 138,2 % erreicht",
+    "detail": "Trendbasierte Extension Start→A→B bei 403,79 – mögliche Kaufzone",
     "age": 0
    },
    {
@@ -136,7 +154,7 @@
     "cat": "rsi",
     "dir": "bull",
     "label": "RSI überverkauft",
-    "detail": "RSI 28,6 (unter 30)",
+    "detail": "RSI 27,9 (unter 30)",
     "age": 0
    }
   ],
@@ -147,6 +165,15 @@
     "label": "MACD kreuzt nach oben",
     "detail": "MACD über Signallinie, unter der Nulllinie",
     "age": 1
+   }
+  ],
+  "CDNS": [
+   {
+    "cat": "rsi",
+    "dir": "bear",
+    "label": "RSI überkauft",
+    "detail": "RSI 70,5 (über 70)",
+    "age": 0
    }
   ],
   "CEG": [
@@ -177,7 +204,7 @@
     "cat": "rsi",
     "dir": "bull",
     "label": "RSI überverkauft",
-    "detail": "RSI 23,9 (unter 30)",
+    "detail": "RSI 23,0 (unter 30)",
     "age": 0
    }
   ],
@@ -192,19 +219,12 @@
   ],
   "CPRT": [
    {
-    "cat": "rsi",
-    "dir": "bull",
-    "label": "RSI überverkauft",
-    "detail": "RSI 30,0 (unter 30)",
-    "age": 0
-   },
-   {
     "cat": "liq",
     "dir": "bear",
     "label": "Bruch unter Liquiditätszone",
-    "detail": "Swing-Tief 26,81: 6 Kontakte, 5,4× Ø-Tagesvolumen",
+    "detail": "Swing-Tief 26,81: 6 Kontakte, 5,3× Ø-Tagesvolumen",
     "age": 0,
-    "score": 5.4
+    "score": 5.3
    }
   ],
   "CRWV": [
@@ -220,15 +240,8 @@
    {
     "cat": "ma",
     "dir": "bull",
-    "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (197,48) nach oben",
-    "age": 0
-   },
-   {
-    "cat": "ma",
-    "dir": "bull",
     "label": "Kurs über EMA 50",
-    "detail": "Schlusskurs kreuzt EMA 50 (197,17) nach oben",
+    "detail": "Schlusskurs kreuzt EMA 50 (197,16) nach oben",
     "age": 0
    }
   ],
@@ -254,16 +267,16 @@
    {
     "cat": "fib",
     "dir": "bull",
-    "label": "Fib 100 % erreicht",
-    "detail": "Abwärtstrend-Extension bei 41,37 – mögliche Kaufzone",
+    "label": "Welle C: Fib 100 % erreicht",
+    "detail": "Trendbasierte Extension Start→A→B bei 41,37 – mögliche Kaufzone",
     "age": 0
    },
    {
     "cat": "ma",
-    "dir": "bull",
-    "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (41,58) nach oben",
-    "age": 1
+    "dir": "bear",
+    "label": "Kurs unter EMA 20",
+    "detail": "Schlusskurs kreuzt EMA 20 (41,58) nach unten",
+    "age": 0
    },
    {
     "cat": "macd",
@@ -273,12 +286,21 @@
     "age": 2
    }
   ],
+  "FAST": [
+   {
+    "cat": "ma",
+    "dir": "bear",
+    "label": "Kurs unter EMA 20",
+    "detail": "Schlusskurs kreuzt EMA 20 (50,09) nach unten",
+    "age": 0
+   }
+  ],
   "FER": [
    {
     "cat": "rsi",
     "dir": "bull",
     "label": "RSI überverkauft",
-    "detail": "RSI 24,5 (unter 30)",
+    "detail": "RSI 24,1 (unter 30)",
     "age": 0
    },
    {
@@ -289,28 +311,19 @@
     "age": 2
    }
   ],
-  "GILD": [
-   {
-    "cat": "ma",
-    "dir": "bull",
-    "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (147,46) nach oben",
-    "age": 0
-   }
-  ],
   "GOOGL": [
-   {
-    "cat": "ma",
-    "dir": "bear",
-    "label": "Kurs unter EMA 50",
-    "detail": "Schlusskurs kreuzt EMA 50 (345,31) nach unten",
-    "age": 0
-   },
    {
     "cat": "macd",
     "dir": "bull",
     "label": "MACD kreuzt nach oben",
     "detail": "MACD über Signallinie, unter der Nulllinie",
+    "age": 2
+   },
+   {
+    "cat": "ma",
+    "dir": "bull",
+    "label": "Kurs über EMA 50",
+    "detail": "Schlusskurs kreuzt EMA 50 (345,25) nach oben",
     "age": 2
    }
   ],
@@ -319,7 +332,7 @@
     "cat": "ma",
     "dir": "bear",
     "label": "Kurs unter EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (211,58) nach unten",
+    "detail": "Schlusskurs kreuzt EMA 20 (211,50) nach unten",
     "age": 0
    }
   ],
@@ -337,7 +350,7 @@
     "cat": "ma",
     "dir": "bull",
     "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (113,11) nach oben",
+    "detail": "Schlusskurs kreuzt EMA 20 (112,99) nach oben",
     "age": 0
    },
    {
@@ -350,6 +363,13 @@
   ],
   "INTU": [
    {
+    "cat": "ma",
+    "dir": "bull",
+    "label": "Kurs über EMA 20",
+    "detail": "Schlusskurs kreuzt EMA 20 (295,95) nach oben",
+    "age": 0
+   },
+   {
     "cat": "macd",
     "dir": "bull",
     "label": "MACD kreuzt nach oben",
@@ -358,13 +378,6 @@
    }
   ],
   "ISRG": [
-   {
-    "cat": "fib",
-    "dir": "watch",
-    "label": "Nähert sich Fib 100 %",
-    "detail": "Noch 2,3 % bis 422,02 (Aufwärtstrend – Ziel)",
-    "age": 0
-   },
    {
     "cat": "ma",
     "dir": "bull",
@@ -378,14 +391,14 @@
     "cat": "ma",
     "dir": "bear",
     "label": "Kurs unter EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (31,06) nach unten",
+    "detail": "Schlusskurs kreuzt EMA 20 (31,02) nach unten",
     "age": 0
    },
    {
     "cat": "ma",
     "dir": "bear",
     "label": "Kurs unter EMA 50",
-    "detail": "Schlusskurs kreuzt EMA 50 (31,02) nach unten",
+    "detail": "Schlusskurs kreuzt EMA 50 (31,00) nach unten",
     "age": 0
    }
   ],
@@ -394,7 +407,7 @@
     "cat": "rsi",
     "dir": "bull",
     "label": "RSI überverkauft",
-    "detail": "RSI 25,4 (unter 30)",
+    "detail": "RSI 25,8 (unter 30)",
     "age": 0
    }
   ],
@@ -412,18 +425,9 @@
     "cat": "liq",
     "dir": "bull",
     "label": "Ausbruch über Liquiditätszone",
-    "detail": "Swing-Hoch 1.085,68: 7 Kontakte, 8,3× Ø-Tagesvolumen",
+    "detail": "Swing-Hoch 1.085,68: 7 Kontakte, 8,2× Ø-Tagesvolumen",
     "age": 2,
-    "score": 8.3
-   }
-  ],
-  "MCHP": [
-   {
-    "cat": "ma",
-    "dir": "bear",
-    "label": "Kurs unter EMA 50",
-    "detail": "Schlusskurs kreuzt EMA 50 (77,40) nach unten",
-    "age": 0
+    "score": 8.2
    }
   ],
   "MELI": [
@@ -474,23 +478,14 @@
     "age": 2
    }
   ],
-  "MRVL": [
-   {
-    "cat": "fib",
-    "dir": "bear",
-    "label": "Fib-Ziel 100 % erreicht",
-    "detail": "Aufwärtstrend-Extension bei 292,32 – Gewinne sichern?",
-    "age": 1
-   }
-  ],
   "MSFT": [
    {
     "cat": "liq",
     "dir": "bull",
     "label": "Ausbruch über Liquiditätszone",
-    "detail": "Swing-Hoch 517,78: 6 Kontakte, 5,5× Ø-Tagesvolumen",
+    "detail": "Swing-Hoch 517,78: 6 Kontakte, 5,4× Ø-Tagesvolumen",
     "age": 2,
-    "score": 5.5
+    "score": 5.4
    }
   ],
   "MU": [
@@ -507,9 +502,9 @@
     "cat": "liq",
     "dir": "bull",
     "label": "Ausbruch über Liquiditätszone",
-    "detail": "Swing-Hoch 234,50: 6 Kontakte, 6,1× Ø-Tagesvolumen",
+    "detail": "Swing-Hoch 234,50: 6 Kontakte, 6,0× Ø-Tagesvolumen",
     "age": 2,
-    "score": 6.1
+    "score": 6.0
    }
   ],
   "NXPI": [
@@ -517,14 +512,14 @@
     "cat": "ma",
     "dir": "bear",
     "label": "Kurs unter EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (235,11) nach unten",
+    "detail": "Schlusskurs kreuzt EMA 20 (235,33) nach unten",
     "age": 0
    },
    {
     "cat": "ma",
     "dir": "bear",
     "label": "Kurs unter EMA 50",
-    "detail": "Schlusskurs kreuzt EMA 50 (238,18) nach unten",
+    "detail": "Schlusskurs kreuzt EMA 50 (238,28) nach unten",
     "age": 0
    }
   ],
@@ -533,16 +528,16 @@
     "cat": "rsi",
     "dir": "bull",
     "label": "RSI überverkauft",
-    "detail": "RSI 17,4 (unter 30)",
+    "detail": "RSI 17,7 (unter 30)",
     "age": 0
    },
    {
     "cat": "liq",
     "dir": "bear",
     "label": "Bruch unter Liquiditätszone",
-    "detail": "Swing-Tief 108,09: 8 Kontakte, 7,7× Ø-Tagesvolumen",
+    "detail": "Swing-Tief 108,09: 8 Kontakte, 7,6× Ø-Tagesvolumen",
     "age": 0,
-    "score": 7.7
+    "score": 7.6
    }
   ],
   "PEP": [
@@ -550,24 +545,24 @@
     "cat": "rsi",
     "dir": "bull",
     "label": "RSI überverkauft",
-    "detail": "RSI 24,7 (unter 30)",
+    "detail": "RSI 22,2 (unter 30)",
     "age": 0
    },
    {
     "cat": "fib",
     "dir": "bull",
-    "label": "Fib 138,2 % erreicht",
-    "detail": "Abwärtstrend-Extension bei 123,42 – mögliche Kaufzone",
+    "label": "Welle C: Fib 138,2 % erreicht",
+    "detail": "Trendbasierte Extension Start→A→B bei 123,42 – mögliche Kaufzone",
     "age": 2
    }
   ],
   "PLTR": [
    {
     "cat": "macd",
-    "dir": "bear",
-    "label": "MACD kreuzt nach unten",
-    "detail": "MACD unter Signallinie, über der Nulllinie",
-    "age": 0
+    "dir": "bull",
+    "label": "MACD kreuzt nach oben",
+    "detail": "MACD über Signallinie, über der Nulllinie",
+    "age": 1
    }
   ],
   "PYPL": [
@@ -590,6 +585,13 @@
    {
     "cat": "ma",
     "dir": "bear",
+    "label": "Kurs unter EMA 50",
+    "detail": "Schlusskurs kreuzt EMA 50 (178,93) nach unten",
+    "age": 0
+   },
+   {
+    "cat": "ma",
+    "dir": "bear",
     "label": "Kurs unter EMA 20",
     "detail": "Schlusskurs kreuzt EMA 20 (183,69) nach unten",
     "age": 2
@@ -600,7 +602,7 @@
     "cat": "ma",
     "dir": "bear",
     "label": "Kurs unter EMA 50",
-    "detail": "Schlusskurs kreuzt EMA 50 (72,25) nach unten",
+    "detail": "Schlusskurs kreuzt EMA 50 (72,27) nach unten",
     "age": 0
    }
   ],
@@ -622,13 +624,22 @@
     "age": 2
    }
   ],
+  "SHOP": [
+   {
+    "cat": "rsi",
+    "dir": "bear",
+    "label": "RSI überkauft",
+    "detail": "RSI 71,2 (über 70)",
+    "age": 0
+   }
+  ],
   "SNDK": [
    {
     "cat": "ma",
-    "dir": "bull",
-    "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (1.698,42) nach oben",
-    "age": 0
+    "dir": "bear",
+    "label": "Kurs unter EMA 20",
+    "detail": "Schlusskurs kreuzt EMA 20 (1.698,11) nach unten",
+    "age": 1
    }
   ],
   "SNPS": [
@@ -636,7 +647,7 @@
     "cat": "rsi",
     "dir": "bear",
     "label": "RSI überkauft",
-    "detail": "RSI 73,6 (über 70)",
+    "detail": "RSI 75,0 (über 70)",
     "age": 0
    }
   ],
@@ -670,13 +681,6 @@
     "label": "MACD kreuzt nach oben",
     "detail": "MACD über Signallinie, unter der Nulllinie",
     "age": 0
-   },
-   {
-    "cat": "ma",
-    "dir": "bull",
-    "label": "Kurs über EMA 20",
-    "detail": "Schlusskurs kreuzt EMA 20 (168,61) nach oben",
-    "age": 0
    }
   ],
   "TRI": [
@@ -685,6 +689,20 @@
     "dir": "bull",
     "label": "MACD kreuzt nach oben",
     "detail": "MACD über Signallinie, unter der Nulllinie",
+    "age": 0
+   },
+   {
+    "cat": "ma",
+    "dir": "bull",
+    "label": "Kurs über EMA 20",
+    "detail": "Schlusskurs kreuzt EMA 20 (98,87) nach oben",
+    "age": 0
+   },
+   {
+    "cat": "ma",
+    "dir": "bull",
+    "label": "Kurs über EMA 50",
+    "detail": "Schlusskurs kreuzt EMA 50 (98,67) nach oben",
     "age": 0
    }
   ],
@@ -706,16 +724,15 @@
     "age": 0
    }
   ],
-  "WBD": [
-   {
-    "cat": "rsi",
-    "dir": "bear",
-    "label": "RSI überkauft",
-    "detail": "RSI 75,2 (über 70)",
-    "age": 0
-   }
-  ],
   "WDC": [
+   {
+    "cat": "liq",
+    "dir": "bear",
+    "label": "Bruch unter Liquiditätszone",
+    "detail": "Swing-Tief 407,35: 11 Kontakte, 14,6× Ø-Tagesvolumen",
+    "age": 0,
+    "score": 14.6
+   },
    {
     "cat": "macd",
     "dir": "bear",
@@ -741,6 +758,13 @@
    }
   ],
   "XEL": [
+   {
+    "cat": "fib",
+    "dir": "bull",
+    "label": "Welle C: Fib 138,2 % erreicht",
+    "detail": "Trendbasierte Extension Start→A→B bei 71,75 – mögliche Kaufzone",
+    "age": 0
+   },
    {
     "cat": "ma",
     "dir": "bull",
